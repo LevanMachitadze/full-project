@@ -19,3 +19,53 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+.switchboard {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(18, 1fr);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.switchboard [data-light] {
+  width: 3px;
+  height: 3px;
+  background: #888;
+  position: relative;
+  border-radius: 50%;
+  transition: transform 250ms ease;
+}
+
+.switchboard [data-light]:after,
+.switchboard [data-light]:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  transition: opacity 250ms ease;
+}
+
+.switchboard [data-light]:after {
+  background: #fff;
+  box-shadow: 0 0 3px 2px #3291ffcc, 0 0 6px 3px #3291ff40;
+}
+
+.switchboard [data-light]:before {
+  background: #3291ff;
+  box-shadow: 0 0 4px 2px #3291ff40;
+}
+
+.switchboard [data-light][data-state='high']:after,
+.switchboard [data-light][data-state='medium']:before {
+  opacity: 1;
+}
+
+.switchboard [data-light][data-state='off'] {
+  background: #444;
+}
