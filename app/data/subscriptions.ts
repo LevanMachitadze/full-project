@@ -1,5 +1,5 @@
 export const subscriptions = {
-  free: {
+  free_tier: {
     name: 'Free Tier',
     description: 'Upload up to 10 files and have 1 employee.',
     price: 'Free',

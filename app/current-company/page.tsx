@@ -28,7 +28,7 @@ const CurrentCompany = () => {
         </p>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-4xl'>
-          <Link href='./current-company/subscription'>
+          <Link href='./current-company/subscriptionPlan'>
             <div className='flex flex-col min-h-full bg-blue-600 hover:bg-blue-700 transition-all text-white py-6 px-8 rounded-lg shadow-lg text-center cursor-pointer'>
               <h2 className='text-xl sm:text-2xl font-semibold mb-4'>
                 Choose Subscription

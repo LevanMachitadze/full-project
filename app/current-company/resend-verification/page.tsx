@@ -5,21 +5,23 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
 import { setCookie } from "cookies-next";
 import Link from "next/link";
-import { axiosInstance } from "../lib/axiosInstance";
+import { axiosInstance } from "../../lib/axiosInstance";
 
 const signInSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  email: z.string().email({ message: "Valid email is required" }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters" }),
+  otpCode: z.string().length(6, { message: "OTP code must be 6 digits" }),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
-export default function EmployeeSignIn() {
+export default function Verify() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -37,61 +39,39 @@ export default function EmployeeSignIn() {
     setErrorMessage(null);
 
     try {
-      const res = await axiosInstance.post("/employees-auth/sign-in", data);
+      const res = await axiosInstance.post(
+        "/employees-auth/resend-verification",
+        data
+      );
 
       if (res.status === 201) {
         setCookie("accessToken", res.data.accessToken, { maxAge: 60 * 60 });
-
-        router.push("/current-company");
+        router.push("/current-company/verify");
       }
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "Login failed");
+      setErrorMessage(error.response?.data?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center   pt-56">
+    <div className="flex justify-center items-center mt-56">
       <div className="max-w-[500px] w-full bg-white p-7 rounded-xl">
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-center">Sign In</h2>
+          <h2 className="text-2xl font-bold text-center">Verify</h2>
 
           {errorMessage && (
             <p className="text-red-500 text-center">{errorMessage}</p>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                {...register("email")}
-                className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${
-                  errors.email ? "border-red-500" : "focus:ring-blue-500"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <input
-                type="password"
-                placeholder="Password"
-                {...register("password")}
-                className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${
-                  errors.password ? "border-red-500" : "focus:ring-blue-500"
-                }`}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
+            <InputField
+              type="email"
+              label="Email"
+              register={register("email")}
+              error={errors.email}
+            />
             <button
               type="submit"
               className={`w-full rounded px-4 py-2 text-white ${
@@ -99,8 +79,17 @@ export default function EmployeeSignIn() {
               }`}
               disabled={loading}
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? "Resending..." : "Resend Verification"}
             </button>
+
+            {/* <button
+              type="submit"
+              className={`w-full rounded px-4 py-2 text-white ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
+              disabled={loading}
+            >
+             Resend Verification
+            </button>
+            */}
           </form>
 
           <p className="text-center text-sm">
@@ -114,6 +103,22 @@ export default function EmployeeSignIn() {
           </p>
         </div>
       </div>
-      </div>
+    </div>
+  );
+}
+
+function InputField({ type = "text", label, register, error }: any) {
+  return (
+    <div>
+      <input
+        type={type}
+        placeholder={label}
+        {...register}
+        className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${
+          error ? "border-red-500" : "focus:ring-blue-500"
+        }`}
+      />
+      {error && <p className="text-red-500 text-sm">{error.message}</p>}
+    </div>
   );
 }
