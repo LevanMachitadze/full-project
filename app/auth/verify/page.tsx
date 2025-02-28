@@ -12,14 +12,12 @@ import { axiosInstance } from "../../lib/axiosInstance";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
+  otpCode: z.string().min(6, { message: "otp code is required" }),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
-export default function SignIn() {
+export default function Verify() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -37,11 +35,12 @@ export default function SignIn() {
     setErrorMessage(null);
 
     try {
-      const res = await axiosInstance.post("/auth/sign-in", data);
+      const res = await axiosInstance.post("/auth/verify", data);
 
       if (res.status === 201) {
         setCookie("accessToken", res.data.accessToken, { maxAge: 60 * 60 });
-        router.push("/current-company");
+
+        router.push("/auth/sign-in");
       }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || "Login failed");
@@ -52,7 +51,7 @@ export default function SignIn() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center">Sign In</h2>
+      <h2 className="text-2xl font-bold text-center">Verify </h2>
 
       {errorMessage && (
         <p className="text-red-500 text-center">{errorMessage}</p>
@@ -75,15 +74,15 @@ export default function SignIn() {
 
         <div>
           <input
-            type="password"
-            placeholder="Password"
-            {...register("password")}
+            type="number"
+            placeholder="otpCode"
+            {...register("otpCode")}
             className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${
-              errors.password ? "border-red-500" : "focus:ring-blue-500"
+              errors.otpCode ? "border-red-500" : "focus:ring-blue-500"
             }`}
           />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password.message}</p>
+          {errors.otpCode && (
+            <p className="text-red-500 text-sm">{errors.otpCode.message}</p>
           )}
         </div>
 
@@ -94,7 +93,7 @@ export default function SignIn() {
           }`}
           disabled={loading}
         >
-          {loading ? "Signing In..." : "Sign In"}
+          {loading ? "Verify..." : "Verify"}
         </button>
       </form>
 

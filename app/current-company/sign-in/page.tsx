@@ -8,7 +8,7 @@ import * as z from "zod";
 import axios from "axios";
 import { setCookie } from "cookies-next";
 import Link from "next/link";
-import { axiosInstance } from "../lib/axiosInstance";
+import { axiosInstance } from "../../lib/axiosInstance";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -42,7 +42,7 @@ export default function EmployeeSignIn() {
       if (res.status === 201) {
         setCookie("accessToken", res.data.accessToken, { maxAge: 60 * 60 });
 
-        router.push("/current-company");
+        router.push("/employee");
       }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || "Login failed");
@@ -52,7 +52,7 @@ export default function EmployeeSignIn() {
   };
 
   return (
-    <div className="flex justify-center   pt-56">
+    <div className="flex justify-center items-center mt-56">
       <div className="max-w-[500px] w-full bg-white p-7 rounded-xl">
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-center">Sign In</h2>
@@ -114,6 +114,6 @@ export default function EmployeeSignIn() {
           </p>
         </div>
       </div>
-      </div>
+    </div>
   );
 }
